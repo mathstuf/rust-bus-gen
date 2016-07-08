@@ -24,11 +24,26 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#![warn(missing_docs)]
+extern crate serde_codegen;
 
-//! D-Bus interface code generator
-//!
-//! This executable is meant to generate the skeleton code for a D-Bus interface using the `bus`
-//! crate. It reads in XML files describing the interface in the D-Bus introspection format.
+use std::env;
+use std::fs;
+use std::path::Path;
 
-mod types;
+pub fn main() {
+    let out_dir = env::var_os("OUT_DIR").unwrap();
+    let paths = [
+        "types",
+    ];
+
+    for path in &paths {
+        let src = format!("src/{}.rs.in", path);
+        let dst = format!("{}.rs", path);
+        let src_path = Path::new(&src);
+        let dst_path = Path::new(&out_dir).join(&dst);
+
+        fs::create_dir_all(dst_path.parent().unwrap()).unwrap();
+
+        serde_codegen::expand(&src_path, &dst_path).unwrap();
+    }
+}
