@@ -15,3 +15,7 @@ serde_codegen = "*"
 
 [dependencies]
 serde = "~0.7"
+#serde_xml = "~0.7"
+
+[dependencies.serde_xml]
+git = "https://github.com/serde-rs/xml.git"

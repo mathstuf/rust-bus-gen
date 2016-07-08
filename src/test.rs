@@ -24,15 +24,36 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#![warn(missing_docs)]
+extern crate serde;
+use self::serde::Deserialize;
 
-//! D-Bus interface code generator
-//!
-//! This executable is meant to generate the skeleton code for a D-Bus interface using the `bus`
-//! crate. It reads in XML files describing the interface in the D-Bus introspection format.
+extern crate serde_xml;
+use self::serde_xml::de::from_iter;
 
-pub mod types;
-mod write;
+use super::write::*;
+use super::types::*;
 
-#[cfg(test)]
-mod test;
+use std::fs::File;
+use std::io::{Bytes, Read};
+
+fn read_test_file<T: Deserialize>(name: &str) -> T {
+    let fin = File::open(format!(concat!(env!("CARGO_MANIFEST_DIR"), "/data/{}.xml"), name)).unwrap();
+
+    from_iter::<Bytes<File>, T>(fin.bytes()).unwrap()
+}
+
+#[test]
+fn test_load_secret_service_collection() {
+    let collection: Interface = read_test_file("secretservice/collection");
+
+    assert_eq!(collection.name, "org.freedesktop.Secret.Collection");
+    assert_eq!(collection.methods.len(), 3);
+    assert_eq!(collection.signals.len(), 3);
+    assert_eq!(collection.properties.len(), 5);
+    assert!(collection.docstring.is_some());
+    assert_eq!(collection.docstring.as_ref().unwrap(), "A collection of items containing secrets.");
+
+    println!("{}", write(collection));
+
+    assert!(false);
+}
