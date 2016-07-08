@@ -30,8 +30,11 @@ use self::serde::{Deserialize, Deserializer, Error};
 use std::borrow::Borrow;
 
 #[derive(PartialEq, Eq)]
+/// The direction for method arguments.
 pub enum ArgumentDirection {
+    /// The argument is an input.
     In,
+    /// The argument is a return value.
     Out,
 }
 
@@ -48,20 +51,29 @@ impl Deserialize for ArgumentDirection {
 }
 
 #[derive(Deserialize)]
+/// The argument to a method call.
 pub struct MethodArgument {
+    /// The name of the argument.
     pub name: String,
     #[serde(rename="type")]
+    /// The D-Bus type signature of the argument.
     pub type_: String,
+    /// Whether the argument in an input or an output to the method.
     pub direction: ArgumentDirection,
 
+    /// The docstring for the method.
     pub docstring: Option<String>,
 }
 
 #[derive(Deserialize)]
+/// Annotations for various bits.
 pub struct Annotation {
+    /// The name of the annotation.
     pub name: String,
+    /// The value for the annotation.
     pub value: String,
 
+    /// The docstring for the annotation.
     pub docstring: Option<String>,
 }
 
